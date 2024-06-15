@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record id="action_property_view_offers" model="ir.actions.act_window">
+            <field name="name">Property Offers</field>
+            <field name="res_model">estate.property.offer</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('property_id', '=', active_id)]</field>
+        </record>
+
         <record id="estate_property_tree_view" model="ir.ui.view">
             <field name="name">estate.property.tree</field>
             <field name="model">estate.property</field>
@@ -13,6 +20,7 @@
                     <field name="expected_price"/>
                     <field name="best_offer"/>
                     <field name="selling_price"/>
+                    <field name="state" widget="badge"/>
                 </tree>
             </field>
         </record>
@@ -22,10 +30,22 @@
             <field name="model">estate.property</field>
             <field name="arch" type="xml">
                 <form>
+                    <header>
+                        <button name="action_sold" type="object" string="Sold" class="btn btn-primary" />
+                        <button name="action_cancel" type="object" string="Cancel" class="btn btn-danger" />
+                        <field name="state" widget="statusbar" statusbar_visible="new,sold,canceled"/>
+                    </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="%(real_estate_ads.action_property_view_offers)d" type="action" icon="fa-handshake-o">
+                                <field name="offer_count" string="Offers" widget="statinfo"/>
+                            </button>
+                        </div>
                         <group>
-                            <field name="name"/>
-                            <field name="tag_ids" widget="many2many_tags" />
+                            <h1>
+                                <field name="name" widget="char_emojis" placeholder="Property Name..." />
+                            </h1>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
                             <group>
                                 <field name="type_id"/>
                                 <field name="postcode"/>
@@ -44,10 +64,10 @@
                                     <field name="bedrooms"/>
                                     <field name="living_area"/>
                                     <field name="facades"/>
-                                    <field name="garage"/>
-                                    <field name="garden"/>
-                                    <field name="garden_area"/>
-                                    <field name="garden_orientation"/>
+                                    <field name="garage" widget="boolean_toggle"/>
+                                    <field name="garden" widget="boolean_toggle"/>
+                                    <field name="garden_area" invisible="garden == False" readonly="garden == True"/>
+                                    <field name="garden_orientation" invisible="garden == False" widget="selection_badge" />
                                     <field name="total_area"/>
                                 </group>
                             </page>
@@ -58,16 +78,19 @@
                                         <field name="partner_id"/>
                                         <field name="creation_date"/>
                                         <field name="validity"/>
-                                        <field name="deadline"/>
+                                        <field name="deadline" widget="remaining_days" />
                                         <field name="status" nolabel="1"/>
+                                        <button name="action_accept_offer" type="object" icon="fa-check" string="Accept"/>
+                                        <button name="action_decline_offer" type="object" icon="fa-times" string="Decline"/>
                                     </tree>                                    
                                 </field>
                             </page>
                             <page string="Other Info">
                                 <group>
-                                    <field name="sales_id"/>
-                                    <field name="buyer_id"/>
-                                    <field name="phone"/>
+                                    <field name="sales_id" widget="many2one_avatar_user" />
+                                    <field name="buyer_id" widget="many2one_avatar_user" />
+                                    <field name="phone" widget="phone" />
+                                    <field name="mobile" widget="phone" />
                                 </group>
                             </page>
                         </notebook>

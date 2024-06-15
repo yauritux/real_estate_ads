@@ -7,6 +7,16 @@ class PropertyOffer(models.Model):
     _name = "estate.property.offer"
     _description = "List of Property offers"
 
+    @api.depends('property_id', 'partner_id')
+    def _compute_name(self):
+        for rec in self:
+            if rec.property_id and rec.partner_id:
+                rec.name = f"{rec.property_id.name} - {rec.partner_id.name}"
+            else:
+                rec.name = False
+
+    name = fields.Char(string="Description", compute=_compute_name)
+
     price = fields.Float(string="Price")
     status = fields.Selection(
         [("accepted", "Accepted"), ("rejected", "Rejected")],
@@ -26,6 +36,19 @@ class PropertyOffer(models.Model):
     # _sql_constraints = [
     #     ('check_validity', 'check(validity > 0)', 'Deadline cannot be set to before creation date')
     # ]
+
+    def action_accept_offer(self):
+
+        self.status = 'accepted'
+
+    def action_decline_offer(self):
+        self.status = 'rejected'
+        print(all(self.property_id.offer_ids.mapped('status')))
+        if all(self.property_id.offer_ids.mapped('status')):
+            self.property_id.write({
+                'selling_price': 0,
+                'state': 'received'
+            })
 
     @api.depends('validity', 'creation_date')
     # @api.depends_context('uid')

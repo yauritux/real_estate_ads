@@ -5,6 +5,13 @@ class Property(models.Model):
     _description = "Property Table"
 
     name = fields.Char(string="Name", required=True)
+    state = fields.Selection(
+        [('new', 'New'), 
+         ('received', 'Offer Received'), 
+         ('accepted', 'Offer Accepted'), 
+         ('sold', 'Sold'), 
+         ('canceled', 'Canceled')],
+        default='new', string="Status")
     tag_ids = fields.Many2many('estate.property.tag', string="Property Tags")
     type_id = fields.Many2one('estate.property.type', string="Property Type")
     description = fields.Text(string="Description")
@@ -26,6 +33,7 @@ class Property(models.Model):
     sales_id = fields.Many2one('res.users', string="Sales Person")
     buyer_id = fields.Many2one('res.partner', string="Buyer", domain=[('is_company', '=', False)])
     phone = fields.Char(string="Phone", related='buyer_id.phone')
+    mobile = fields.Char(string="Mobile", related='buyer_id.mobile')
 
     # @api.depends('living_area', 'garden_area')
     # def _compute_total_area(self):
@@ -37,6 +45,28 @@ class Property(models.Model):
     
     # total_area = fields.Integer(string="Total Area", compute=_compute_total_area)
     total_area = fields.Integer(string="Total Area")
+
+    def action_sold(self):
+        self.state = 'sold'
+
+    def action_cancel(self):
+        self.state = 'canceled'
+
+    @api.depends('offer_ids')
+    def _compute_offer_count(self):
+        for rec in self:
+            rec.offer_count = len(rec.offer_ids)
+
+    offer_count = fields.Integer(string="Offer Count", compute=_compute_offer_count)
+
+    # def action_property_view_offers(self):
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': f"{self.name} - Offers",
+    #         'domain': [('property_id', '=', self.id)],
+    #         'view_mode': 'tree',
+    #         'res_model': 'estate.property.offer'
+    #     }
     
 
 class PropertyType(models.Model):
@@ -51,3 +81,4 @@ class PropertyTags(models.Model):
     _description = "List of Property Tags"
 
     name = fields.Char(string="Name", required=True)
+    color = fields.Char(string="Color")
