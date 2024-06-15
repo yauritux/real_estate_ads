@@ -38,7 +38,13 @@ class PropertyOffer(models.Model):
     # ]
 
     def action_accept_offer(self):
-
+        offer_ids = self.env['estate.property.offer'].search([
+            ('property_id', '=', self.property_id.id),
+            ('status', '=', 'accepted'),
+        ])
+        if offer_ids:
+            raise ValidationError("you have an accepted offer already")
+        
         self.status = 'accepted'
 
     def action_decline_offer(self):
