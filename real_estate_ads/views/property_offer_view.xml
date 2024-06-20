@@ -6,7 +6,7 @@
             <field name="name">estate.property.offer.tree</field>
             <field name="model">estate.property.offer</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree decoration-success="status == 'accepted'" decoration-danger="status == 'rejected'">
                     <field name="price"/>
                     <field name="status"/>
                     <field name="partner_id"/>
@@ -15,6 +15,14 @@
                     <field name="validity"/>
                     <field name="deadline"/>                    
                 </tree>
+            </field>
+        </record>
+
+        <record id="estate_property_offer_gantt_view" model="ir.ui.view">
+            <field name="name">estate.property.offer.gantt</field>
+            <field name="model">estate.property.offer</field>
+            <field name="arch" type="xml">
+                <gantt date_start="creation_date" date_stop="deadline" default_group_by="partner_id"/>
             </field>
         </record>
 
@@ -35,6 +43,7 @@
                                 <field name="creation_date"/>
                                 <field name="validity"/>
                                 <field name="deadline"/>
+                                <field name="partner_email"/>
                             </group>
                         </group>
                     </sheet>
@@ -45,7 +54,7 @@
         <record id="action_property_offers" model="ir.actions.act_window">
             <field name="name">Property Offers</field>
             <field name="res_model">estate.property.offer</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,gantt,form</field>
             <field name="view_id" ref="estate_property_offer_tree_view"/>
         </record>
     </data>
