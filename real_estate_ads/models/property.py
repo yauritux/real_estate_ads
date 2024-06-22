@@ -93,6 +93,13 @@ class Property(models.Model):
             }
         }
     
+    def action_url_action(self):
+        return {
+            'type': 'ir.actions.act_url',
+            'url': 'https://bisnisin.asia',
+            'target': 'new' # other target: 'self (open on the same page)'
+        }
+    
 
 class PropertyType(models.Model):
     _name = "estate.property.type"

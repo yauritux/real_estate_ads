@@ -155,6 +155,9 @@
                             <button class="oe_stat_button" name="action_client_notify" type="object" icon="fa-bell-o">
                                 <field name="offer_count" string="Notify" widget="statinfo"/>
                             </button>
+                            <button class="oe_stat_button" name="action_url_action" type="object" icon="fa-info-circle">
+                                Info
+                            </button>
                         </div>
                         <group>
                             <h1>
