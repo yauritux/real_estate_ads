@@ -114,3 +114,12 @@ class PropertyOffer(models.Model):
         for rec in self:
             if rec.deadline and rec.creation_date and rec.deadline <= rec.creation_date:
                 raise ValidationError(_("Deadline cannot be set to before creation date"))
+
+    def extend_offer_deadline(self):
+        print('context=', self._context)
+        active_ids = self._context.get('active_ids', [])
+        print(active_ids)
+        if active_ids:
+            offer_ids = self.env['estate.property.offer'].browse(active_ids)
+            for offer in offer_ids:
+                offer.validity = 10

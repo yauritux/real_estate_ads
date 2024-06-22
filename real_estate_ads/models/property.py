@@ -1,4 +1,4 @@
-from odoo import fields, models, api
+from odoo import fields, models, api, _
 
 class Property(models.Model):
     _name = "estate.property"
@@ -75,6 +75,23 @@ class Property(models.Model):
                 rec.best_offer = max(rec.offer_ids.mapped('price'))
             else:
                 rec.best_offer = 0
+
+    def action_client_refresh(self):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload'
+        }
+    
+    def action_client_notify(self):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('You have done great so far'),
+                'type': 'success', # other types: 'warning', 'danger'
+                'sticky': False,
+            }
+        }
     
 
 class PropertyType(models.Model):
