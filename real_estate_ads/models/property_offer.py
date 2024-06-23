@@ -26,7 +26,7 @@ class PropertyOffer(models.Model):
 
     name = fields.Char(string="Description", compute=_compute_name)
 
-    price = fields.Float(string="Price")
+    price = fields.Monetary(string="Price")
     status = fields.Selection(
         [("accepted", "Accepted"), ("rejected", "Rejected")],
         string="Status")
@@ -35,6 +35,7 @@ class PropertyOffer(models.Model):
     property_id = fields.Many2one("estate.property", string="Property")
     validity = fields.Integer(string="Validity")
     deadline = fields.Date(string="Deadline", compute='_compute_deadline', inverse='_inverse_deadline')
+    currency_id = fields.Many2one('res.currency', string="Currency", default=lambda self: self.env.user.company_id.currency_id)
 
     # @api.model
     # def _set_create_date(self):
