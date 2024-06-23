@@ -2,8 +2,9 @@ from odoo import fields, models, api, _
 
 class Property(models.Model):
     _name = "estate.property"
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'utm.mixin', 'website.published.mixin', 'website.seo.metadata']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     # 'mail.alias.mixin'
+    # 'utm.mixin', 'website.published.mixin', 'website.seo.metadata'
     _description = "Property Table"
 
     name = fields.Char(string="Name", required=True)

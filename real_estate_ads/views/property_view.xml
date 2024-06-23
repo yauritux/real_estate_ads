@@ -29,6 +29,7 @@
                     </group>
                     <searchpanel>
                         <field name="state" icon="fa-filter" groupby="group_by_state" limit="0"/>
+                        <field name="type_id" icon="fa-filter" groupby="group_by_type_id" limit="0"/>
                     </searchpanel>
                 </search>
             </field>
@@ -54,7 +55,7 @@
                     <field name="name" type="row"/>
                     <field name="selling_price" type="measure"/>
                     <field name="expected_price" type="measure"/>
-                    <field name="best_offer" type="measure"/>
+                    <!-- <field name="best_offer" type="measure"/> -->
                     <field name="facades" type="measure"/>
                     <field name="bedrooms" type="measure"/>
                     <field name="state" type="col"/>
@@ -156,9 +157,9 @@
                             <button class="oe_stat_button" name="action_client_notify" type="object" icon="fa-bell-o">
                                 <field name="offer_count" string="Notify" widget="statinfo"/>
                             </button>
-                            <button class="oe_stat_button" name="website_publish_button" type="object" icon="fa-globe">
+                            <!-- <button class="oe_stat_button" name="website_publish_button" type="object" icon="fa-globe">
                                 <field name="is_published" widget="website_publish_button"/>
-                            </button>
+                            </button> -->
                             <button class="oe_stat_button" name="action_url_action" type="object" icon="fa-info-circle">
                                 Info
                             </button>
@@ -212,14 +213,14 @@
                             <page string="Other Info">
                                 <group>
                                     <field name="sales_id" widget="many2one_avatar_user" />
-                                    <field name="campaign_id"/>
+                                    <!-- <field name="campaign_id"/>
                                     <field name="source_id"/>
-                                    <field name="medium_id"/>
+                                    <field name="medium_id"/> -->
                                     <field name="buyer_id" widget="many2one_avatar_user" />
                                     <field name="phone" widget="phone" />
                                     <field name="mobile" widget="phone" />
                                     <field name="email" widget="email"/>
-                                    <field name="website_url"/>
+                                    <!-- <field name="website_url"/> -->
                                 </group>
                             </page>
                         </notebook>
