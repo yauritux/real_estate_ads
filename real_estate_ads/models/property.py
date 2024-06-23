@@ -2,22 +2,25 @@ from odoo import fields, models, api, _
 
 class Property(models.Model):
     _name = "estate.property"
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'utm.mixin', 'website.published.mixin', 'website.seo.metadata']
+    # 'mail.alias.mixin'
     _description = "Property Table"
 
     name = fields.Char(string="Name", required=True)
+    # alias_id = fields.Many2one('mail.alias', string="Email Alias", ondelete='restrict', required=True)
     state = fields.Selection(
         [('new', 'New'), 
          ('received', 'Offer Received'), 
          ('accepted', 'Offer Accepted'), 
          ('sold', 'Sold'), 
          ('canceled', 'Canceled')],
-        default='new', string="Status")
+        default='new', string="Status", group_expand='_expand_state')
     tag_ids = fields.Many2many('estate.property.tag', string="Property Tags")
     type_id = fields.Many2one('estate.property.type', string="Property Type")
     description = fields.Text(string="Description")
     postcode = fields.Char(string="Postcode")
     date_availability = fields.Date(string="Available From")
-    expected_price = fields.Float(string="Expected Price")
+    expected_price = fields.Float(string="Expected Price", tracking=True)
     best_offer = fields.Float(string="Best offer", compute='_compute_best_price')
     selling_price = fields.Float(string="Selling Price", readonly=True)
     bedrooms = fields.Integer(string="Bedrooms")
@@ -31,9 +34,10 @@ class Property(models.Model):
         string="Garden Orientation", default="north")
     offer_ids = fields.One2many('estate.property.offer', 'property_id', string="Offers")
     sales_id = fields.Many2one('res.users', string="Sales Person")
-    buyer_id = fields.Many2one('res.partner', string="Buyer", domain=[('is_company', '=', False)])
+    buyer_id = fields.Many2one('res.partner', string="Buyer", domain=[('is_company', '=', False)], tracking=True)
     phone = fields.Char(string="Phone", related='buyer_id.phone')
     mobile = fields.Char(string="Mobile", related='buyer_id.mobile')
+    email = fields.Char(string="Email", related='buyer_id.email', tracking=True)
 
     # @api.depends('living_area', 'garden_area')
     # def _compute_total_area(self):
@@ -51,6 +55,50 @@ class Property(models.Model):
 
     def action_cancel(self):
         self.state = 'canceled'
+
+    def action_send_email(self):
+        mail_template = self.env.ref('real_estate_ads.offer_mail_template')
+        mail_template.send_mail(self.id, force_send=True)
+
+    def _get_emails(self):
+        return ','.join(self.offer_ids.mapped('partner_email'))
+    
+    # @api.model
+    # def create(self, vals):
+    #     record = super(Property, self).create(vals)
+    #     alias_values = {
+    #         'alias_name': record.name,
+    #         'alias_model_id': self.env['ir.model'].search([('model', '=', 'estate.property')], limit=1).id,
+    #         'alias_force_thread_id': record.id,
+    #         'alias_defaults': {'alias_id': record.id}
+    #     }
+    #     alias = self.env['mail.alias'].create(alias_values)        
+    #     # alias = self.env['mail.alias'].search([('alias_full_name', '=', 'sales@bisnisin.asia')])
+    #     print('alias=', alias)
+    #     record.alias_id = alias.id
+    #     return record
+    
+    # def _alias_get_creation_values(self):
+    #     return {
+    #         'alias_name': self.name,
+    #         'alias_model_id': self.env['ir.model'].search([('model', '=', 'estate.property')], limit=1).id,
+    #         'alias_force_thread_id': self.id,
+    #         'alias_defaults': {'custom_model_id': self.id}
+    #     }    
+    
+    # def _alias_get_default_thread_id(self):
+    #     return self.id
+    
+    # def _alias_get_object_id(self, alias, mail, record):
+    #     return self.id
+
+    def message_update(self, msg_dict, update_vals=None):
+        print('message_update got called...')
+        print('msg_dict=', msg_dict)
+        if update_vals:
+            self.write(update_vals)
+
+        return super(Property, self).message_update(msg_dict, update_vals)
 
     @api.depends('offer_ids')
     def _compute_offer_count(self):
@@ -99,6 +147,19 @@ class Property(models.Model):
             'url': 'https://bisnisin.asia',
             'target': 'new' # other target: 'self (open on the same page)'
         }
+    
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        return 'Estate Property - %s' % (self.name)
+    
+    def _compute_website_url(self):
+        for rec in self:
+            rec.website_url = "/properties/%s" % rec.id
+
+    def _expand_state(self, states, domain, order):
+        return [
+            key for key, dummy in type(self).state.selection
+        ]
     
 
 class PropertyType(models.Model):

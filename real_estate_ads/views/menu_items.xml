@@ -3,6 +3,7 @@
     <menuitem name="Property Ads" id="menu_root_property_ads" web_icon="real_estate_ads,static/description/icon.png">
         <menuitem id="menu_property_ads" name="Ads">
             <menuitem id="menu_property" name="Property" action="real_estate_ads.action_property" />
+            <!-- <menuitem id="menu_messages" name="Messages" action="mail.mail.view_message_tree"/> -->
         </menuitem>
         <menuitem id="menu_property_ads_settings" name="Settings">
             <menuitem id="menu_property_type" name="Property Types" action="real_estate_ads.action_property_type" />
